@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JOKES GENERATOR</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="bg-gray-100 p-5">
+    <div class="mx-auto max-w-2xl rounded-lg bg-white p-6 shadow">
+        <h1 class="mb-5 text-center text-3xl font-bold text-purple-600"> RANDOM JOKES </h1>
+      <div class="mb-4 rounded bg-purple-50 p-4">
+      <h2 id="setup"class="font-bold text-purple-600">Setup</h2>
+      
+    </div>
+    <div lass="mb-5 rounded bg-gray-100 p-4">
+      <h2 id="punchline" class="font-bold mt-5 text-grey-700">Punchline</h2>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <button onclick="getData()"  class="rounded bg-purple-600 px-4 py-2 text-white hover:bg-purple-700">Generate Now</button>
+      <button onclick="AddtoFav()" class="rounded bg-pink-600 px-4 py-2 text-white hover:bg-pink-700">AddtoFav</button>
+    </div>
+    </div>
+    
+    
+    <hr />
+    <div class="mx-auto mt-8 max-w-2xl rounded-lg bg-white p-6 shadow">
+      <h2 class="mb-4 text-x1 font-bold">FAV JOKES</h2>
+    <div class="overflow-x-auto rounded-lg ">
+      <table class="w-full border-collapse text-left">
+        <thead class="bg-purple-100">
+          <tr>
+            <th >Setup</th>
+            <th>Punchline</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="result">
+          <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>
+              <button onlick="deleteData('${eachData.punchline}')">
+                delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </div>
+
+    
+  </body>
+  <script>
+    let apiResponse = null;
+    let favData = JSON.parse(localStorage.getItem("data")) || [];
+    const getData = async () => {
+      try {
+        apiResponse = await fetch(
+          "https://official-joke-api.appspot.com/random_joke",
+        );
+        apiResponse = await apiResponse.json();
+        console.log(apiResponse);
+
+        document.getElementById("setup").innerText = apiResponse.setup;
+        document.getElementById("punchline").innerText = apiResponse.punchline;
+      } catch (error) {
+        console.log(error);
+        alert("error occured");
+      }
+    };
+    getData();
+    const AddtoFav = () => {
+      favData.unshift(apiResponse);
+
+      let jsonData = JSON.stringify(favData);
+      localStorage.setItem("data", jsonData);
+      showFavData();
+      alert("added");
+    };
+
+    const showFavData = () => {
+      favData = JSON.parse(localStorage.getItem("data")) ||[]
+
+      let resultE1 = document.getElementById("result");
+
+      resultE1.innerHTML = "";
+      favData.map(
+        (eachData) =>
+          (resultE1.innerHTML += ` <tr>
+                    <td>${eachData.setup}</td>
+                    <td>${eachData.punchline}</td>
+                    <td><button onclick="deleteData('${eachData.punchline}')">delete</button></td>
+                </tr>`),
+      );
+    };
+    showFavData();
+    const deleteData = (dPunchline) => {
+      favData = JSON.parse(localStorage.getItem("data"))
+
+      let filteredData = favData.filter(
+        (eachData) => eachData.punchline!= dPunchline);
+      localStorage.setItem("data", JSON.stringify(filteredData));
+      alert("deleted");
+      showFavData();
+    };
+  </script>
+</html>
